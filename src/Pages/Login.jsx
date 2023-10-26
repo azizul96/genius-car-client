@@ -1,8 +1,9 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, } from 'react-router-dom';
 import img from '../assets/images/login/login.svg'
 import { useContext } from 'react';
 import { AuthContext } from '../Context/AuthProvider';
 import toast from 'react-hot-toast';
+import axios from 'axios';
 
 const Login = () => {
     const {emailLogin } = useContext(AuthContext)
@@ -17,9 +18,22 @@ const Login = () => {
 
         emailLogin(email,password)
         .then(result =>{
-            console.log(result.user);
+            const loggedInUser = result.user
+            console.log(loggedInUser);
             toast.success('Login successfully');
-            navigate(location?.state ? location.state : '/')
+
+            const user = { email };
+            
+            // get access token
+            // {withCredentials:true}
+            
+            axios.post('http://localhost:5000/jwt', user, {withCredentials:true})
+            .then(res =>{
+                console.log(res.data);
+                if(res.data.success){
+                    navigate(location?.state ? location.state : '/')
+                }
+            })
         })
         .catch(error =>{
             toast.error(error.message);
